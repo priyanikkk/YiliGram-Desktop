@@ -36,10 +36,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 namespace {
 
 rpl::producer<TextWithEntities> Text1() {
-	return tr::lng_about_text1(
-		lt_api_link,
-		tr::lng_about_text1_api(tr::url(u"https://core.telegram.org/api"_q)),
-		tr::marked);
+	// YiliGram: fixed text, so a downloaded language pack can't call it official.
+	return rpl::single(TextWithEntities{ u"Unofficial Telegram client based on Telegram Desktop.\nUses the "_q }
+		.append(tr::link(u"Telegram API"_q, u"https://core.telegram.org/api"_q))
+		.append(u"."_q));
 }
 
 rpl::producer<TextWithEntities> Text2() {
@@ -47,11 +47,11 @@ rpl::producer<TextWithEntities> Text2() {
 		lt_gpl_link,
 		rpl::single(tr::link(
 			"GNU GPL",
-			"https://github.com/telegramdesktop/tdesktop/blob/master/LICENSE")),
+			"https://github.com/priyanikkk/YiliGram-Desktop/blob/main/LICENSE")),
 		lt_github_link,
 		rpl::single(tr::link(
 			"GitHub",
-			"https://github.com/telegramdesktop/tdesktop")),
+			"https://github.com/priyanikkk/YiliGram-Desktop")),
 		tr::marked);
 }
 
@@ -65,7 +65,7 @@ rpl::producer<TextWithEntities> Text3() {
 } // namespace
 
 void AboutBox(not_null<Ui::GenericBox*> box) {
-	box->setTitle(u"Telegram Desktop"_q);
+	box->setTitle(u"YiliGram Desktop"_q);
 
 	auto layout = box->verticalLayout();
 
