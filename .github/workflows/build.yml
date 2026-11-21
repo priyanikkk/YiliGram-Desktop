@@ -2,6 +2,12 @@ name: Build
 
 on:
   workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform'
+        type: choice
+        options: [all, windows, linux]
+        default: all
 
 permissions:
   contents: read
@@ -9,6 +15,7 @@ permissions:
 jobs:
   linux:
     name: Linux
+    if: inputs.platform != 'windows'
     runs-on: ubuntu-latest
     env:
       IMAGE_TAG: tdesktop:centos_env
@@ -99,6 +106,7 @@ jobs:
 
   windows:
     name: Windows
+    if: inputs.platform != 'linux'
     runs-on: windows-latest
     env:
       PREPARE_PATH: "Telegram/build/prepare/prepare.py"
@@ -111,7 +119,6 @@ jobs:
           for %%I in ("%GITHUB_WORKSPACE%") do set DRIVE=%%~dI
           mkdir %DRIVE%\TBuild\Libraries
           mklink /d %GITHUB_WORKSPACE%\TBuild %DRIVE%\TBuild
-          wmic logicaldisk get caption,freespace
           echo TBUILD=%GITHUB_WORKSPACE%\TBuild>>%GITHUB_ENV%
           echo LibrariesPath=%GITHUB_WORKSPACE%\TBuild\Libraries\win64>>%GITHUB_ENV%
 
