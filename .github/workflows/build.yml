@@ -178,8 +178,9 @@ jobs:
           restore-keys: ${{ runner.OS }}-x64-qt6-release-libs-
 
       - name: Libraries.
+        id: libs
         run: |
-          %TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat silent qt6
+          %TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat silent qt6 || %TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat silent qt6
 
       - name: Free up some disk space.
         shell: bash
@@ -188,14 +189,14 @@ jobs:
           df -h
 
       - name: Save ThirdParty cache.
-        if: steps.tp-cache.outputs.cache-hit != 'true'
+        if: always() && steps.tp-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: ${{ env.TBUILD }}\ThirdParty
           key: ${{ runner.OS }}-third-party-${{ env.CACHE_KEY }}
 
       - name: Save libraries cache.
-        if: steps.win-libs-cache.outputs.cache-hit != 'true'
+        if: always() && steps.win-libs-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: ${{ env.LibrariesPath }}
