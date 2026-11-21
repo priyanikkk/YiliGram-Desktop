@@ -7,6 +7,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "ui/unread_badge.h"
 
+#include "yiligram/yili_badges.h"
+
 #include "data/data_emoji_statuses.h"
 #include "data/data_peer.h"
 #include "data/data_user.h"
@@ -250,6 +252,34 @@ PeerBadge::~PeerBadge() = default;
 int PeerBadge::drawGetWidth(Painter &p, Descriptor &&descriptor) {
 	Expects(descriptor.customEmojiRepaint != nullptr);
 
+	const auto yili = Yili::BadgeFor(descriptor.peer);
+	if (!yili) {
+		return drawTelegramBadges(p, std::move(descriptor));
+	}
+	const auto rect = descriptor.rectForName;
+	const auto nameWidth = descriptor.nameWidth;
+	const auto outerWidth = descriptor.outerWidth;
+	const auto size = descriptor.verified
+		? descriptor.verified->height()
+		: rect.height();
+	const auto skip = st::lineWidth * 2;
+	descriptor.rectForName.setWidth(rect.width() - size - skip);
+	const auto used = drawTelegramBadges(p, std::move(descriptor));
+	const auto left = rect.x()
+		+ std::min(nameWidth + used, rect.width() - size - skip)
+		+ skip;
+	const auto top = rect.y();
+	const auto inner = size * 0.1;
+	auto area = QRectF(left, top, size, size).marginsRemoved(
+		{ inner, inner, inner, inner });
+	if (style::RightToLeft()) {
+		area.moveLeft(outerWidth - area.x() - area.width());
+	}
+	Yili::PaintBadge(p, *yili, area);
+	return used + skip + size;
+}
+
+int PeerBadge::drawTelegramBadges(Painter &p, Descriptor &&descriptor) {
 	const auto peer = descriptor.peer;
 	if ((descriptor.scam && (peer->isScam() || peer->isFake()))
 		|| (descriptor.direct && peer->isMonoforum())) {

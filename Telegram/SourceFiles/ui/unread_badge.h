@@ -97,6 +97,7 @@ private:
 	struct EmojiStatus;
 	struct BotVerifiedData;
 
+	int drawTelegramBadges(Painter &p, Descriptor &&descriptor);
 	int drawTextBadge(Painter &p, const Descriptor &descriptor);
 	int drawVerifyCheck(Painter &p, const Descriptor &descriptor);
 	int drawPremiumEmojiStatus(Painter &p, const Descriptor &descriptor);

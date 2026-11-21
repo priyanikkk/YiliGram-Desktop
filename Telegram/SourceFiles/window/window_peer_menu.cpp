@@ -128,6 +128,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "boxes/peers/edit_peer_info_box.h"
 #include "boxes/peers/manage_community_box.h"
 #include "boxes/premium_preview_box.h"
+#include "yiligram/yili_badges.h"
+#include "yiligram/yili_settings.h"
 #include "styles/style_chat.h"
 #include "styles/style_chat_helpers.h"
 #include "styles/style_credits.h"
@@ -349,6 +351,7 @@ private:
 	void addDeleteTopic();
 	void addVideoChat();
 	void addViewStatistics();
+	void addYiliBadge();
 	void addBoostChat();
 	void addToggleFee();
 	void addSetPersonalChannel();
@@ -1983,9 +1986,22 @@ void Filler::fillProfileActions() {
 	addBlockUser();
 	addBanFromChannel();
 	addReport();
+	addYiliBadge();
 	addLeaveChat();
 	addDeleteContact();
 	addDeleteTopic();
+}
+
+void Filler::addYiliBadge() {
+	if (_topic || _peer->isSelf() || _peer->isMonoforum()) {
+		return;
+	}
+	const auto controller = _controller;
+	const auto peer = _peer;
+	_addAction(
+		Yili::Tr("YiliGram badge", "Бейдж YiliGram", "Бейдж YiliGram"),
+		[=] { Yili::ShowBadgeGrant(controller, peer); },
+		&st::menuIconStar);
 }
 
 void Filler::fillRepliesActions() {

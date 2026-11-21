@@ -102,6 +102,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "window/window_session_controller.h"
 #include "ui/toast/toast.h"
 #include "boxes/sticker_set_box.h"
+#include "yiligram/yili_badges.h"
 #include "styles/style_chat.h"
 #include "styles/style_info.h"
 #include "styles/style_info_profile_top_bar.h"
@@ -551,6 +552,16 @@ TopBar::TopBar(
 	}, _title->lifetime());
 
 	setupUniqueBadgeTooltip();
+	if (!_savedMessages) {
+		_yiliBadge = Yili::CreateBadgeButton(
+			this,
+			controller,
+			_peer,
+			_title->height());
+		Yili::BadgesChanges() | rpl::on_next([=] {
+			updateLabelsPosition();
+		}, _yiliBadge->lifetime());
+	}
 	setupButtons(controller, descriptor.source);
 	setupSwipeBack(controller);
 	setupUserpicButton(controller);
@@ -2022,6 +2033,15 @@ void TopBar::updateTitlePosition(float64 progressCurrent) {
 	if (verifiedWidget || badgeWidget) {
 		badgesWidth += st::infoVerifiedCheckPosition.x();
 	}
+	const auto yiliBadge = (_yiliBadge && !_yiliBadge->isHidden())
+		? _yiliBadge
+		: nullptr;
+	const auto yiliSize = _title->height();
+	const auto yiliSkip = st::infoVerifiedCheckPosition.x();
+	if (yiliBadge) {
+		yiliBadge->resize(yiliSize, yiliSize);
+		badgesWidth += yiliSize + yiliSkip;
+	}
 	const auto titleWidth = width()
 		- interpolatedPadding
 		- reservedRight
@@ -2053,6 +2073,9 @@ void TopBar::updateTitlePosition(float64 progressCurrent) {
 	if (verifiedWidget || badgeWidget) {
 		totalElementsWidth += st::infoVerifiedCheckPosition.x();
 	}
+	if (yiliBadge) {
+		totalElementsWidth += yiliSize + yiliSkip;
+	}
 	totalElementsWidth += botVerifySkip;
 
 	auto titleLeft = anim::interpolate(
@@ -2078,6 +2101,15 @@ void TopBar::updateTitlePosition(float64 progressCurrent) {
 			badgeLeft + (badgeWidget ? badgeWidget->width() : 0),
 			badgeTop,
 			badgeBottom);
+	}
+	if (yiliBadge) {
+		yiliBadge->moveToLeft(
+			badgeLeft
+				+ (badgeWidget ? badgeWidget->width() : 0)
+				+ (verifiedWidget ? verifiedWidget->width() : 0)
+				+ yiliSkip,
+			titleTop);
+		yiliBadge->raise();
 	}
 }
 
