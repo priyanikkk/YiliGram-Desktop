@@ -405,3 +405,79 @@ index e2ba0d6..84cb6b7 100644
 +dialogsMentionIconFg: #c09848 | dialogsVerifiedIconBg; // chat list mention icon
  dialogsReactionIconFg: #e05356 | attentionButtonFg; // chat list reaction icon
  dialogsPollIconFg: #997be1 | historyPeer5NameFg; // chat list poll icon
+diff --git a/ui/widgets/checkbox.cpp b/ui/widgets/checkbox.cpp
+index df0dc58..da992e8 100644
+--- a/ui/widgets/checkbox.cpp
++++ b/ui/widgets/checkbox.cpp
+@@ -84,6 +84,10 @@ void ToggleView::setStyle(const style::Toggle &st) {
+ }
+ 
+ void ToggleView::paint(QPainter &p, int left, int top, int outerWidth) {
++	if (!_locked && _st->xsize <= 0) {
++		paintMaterial(p, left, top, outerWidth);
++		return;
++	}
+ 	left += _st->border;
+ 	top += _st->border;
+ 
+@@ -119,6 +123,48 @@ void ToggleView::paint(QPainter &p, int left, int top, int outerWidth) {
+ 	}
+ }
+ 
++// Material 3 switch: a filled track, a small outlined thumb when off
++// and a larger one on the accent color when on.
++void ToggleView::paintMaterial(
++		QPainter &p,
++		int left,
++		int top,
++		int outerWidth) {
++	PainterHighQualityEnabler hq(p);
++	const auto toggled = currentAnimationValue();
++	const auto height = _st->diameter + 2 * _st->border;
++	const auto width = _st->diameter + _st->width + 2 * _st->border;
++	const auto line = std::max(_st->border, 1);
++	const auto track = QRectF(style::rtlrect(
++		left,
++		top,
++		width,
++		height,
++		outerWidth)).marginsRemoved(
++			{ line / 2., line / 2., line / 2., line / 2. });
++	const auto radius = track.height() / 2.;
++
++	auto pen = anim::pen(_st->untoggledFg, _st->toggledFg, toggled);
++	pen.setWidthF(line);
++	p.setPen(pen);
++	p.setBrush(anim::brush(_st->untoggledBg, _st->toggledFg, toggled));
++	p.drawRoundedRect(track, radius, radius);
++
++	const auto offSize = height * 0.5;
++	const auto onSize = height * 0.72;
++	const auto size = offSize + (onSize - offSize) * toggled;
++	const auto from = left + height / 2.;
++	const auto till = left + width - height / 2.;
++	auto x = from + (till - from) * toggled;
++	if (style::RightToLeft()) {
++		x = outerWidth - x;
++	}
++	const auto y = top + height / 2.;
++	p.setPen(Qt::NoPen);
++	p.setBrush(anim::brush(_st->untoggledFg, _st->toggledBg, toggled));
++	p.drawEllipse(QPointF(x, y), size / 2., size / 2.);
++}
++
+ void ToggleView::paintXV(QPainter &p, int left, int top, int outerWidth, float64 toggled, const QBrush &brush) {
+ 	Expects(_st->vsize > 0);
+ 	Expects(_st->stroke > 0);
+diff --git a/ui/widgets/checkbox.h b/ui/widgets/checkbox.h
+index d351629..d6bc102 100644
+--- a/ui/widgets/checkbox.h
++++ b/ui/widgets/checkbox.h
+@@ -154,6 +154,7 @@ public:
+ 	void setLocked(bool locked);
+ 
+ private:
++	void paintMaterial(QPainter &p, int left, int top, int outerWidth);
+ 	void paintXV(QPainter &p, int left, int top, int outerWidth, float64 toggled, const QBrush &brush);
+ 	QSize rippleSize() const;
+ 
