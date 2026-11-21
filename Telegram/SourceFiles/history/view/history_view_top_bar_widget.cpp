@@ -67,6 +67,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "support/support_helper.h"
 #include "apiwrap.h"
 #include "api/api_chat_participants.h"
+#include "yiligram/yili_settings.h"
 #include "styles/style_window.h"
 #include "styles/style_dialogs.h"
 #include "styles/style_chat.h"
@@ -142,6 +143,11 @@ TopBarWidget::TopBarWidget(
 	Lang::Updated(
 	) | rpl::on_next([=] {
 		refreshLang();
+	}, lifetime());
+
+	Yili::SettingsChanges(
+	) | rpl::on_next([=] {
+		updateControlsVisibility();
 	}, lifetime());
 
 	_forward->setClickedCallback([=] { _forwardSelection.fire({}); });
@@ -1438,6 +1444,7 @@ void TopBarWidget::updateControlsVisibility() {
 	}();
 	_call->setVisible(historyMode
 		&& callsEnabled
+		&& Yili::HeaderCallButton()
 		&& !_chooseForReportReason);
 	const auto groupCallsEnabled = [&] {
 		if (const auto peer = _activeChat.key.peer()) {

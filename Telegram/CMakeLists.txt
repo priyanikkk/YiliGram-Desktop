@@ -2611,6 +2611,12 @@ PRIVATE
     window/themes/window_themes_embedded.h
     window/themes/window_themes_generate_name.cpp
     window/themes/window_themes_generate_name.h
+    yiligram/yili_badges.cpp
+    yiligram/yili_badges.h
+    yiligram/yili_settings.cpp
+    yiligram/yili_settings.h
+    yiligram/yili_settings_box.cpp
+    yiligram/yili_settings_box.h
     apiwrap.cpp
     apiwrap.h
     config.h

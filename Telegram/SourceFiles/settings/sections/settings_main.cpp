@@ -89,6 +89,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include <QtGui/QGuiApplication>
 #include <QtGui/QWindow>
 
+#include "yiligram/yili_settings_box.h"
 #include "styles/style_chat_helpers.h"
 #include "styles/style_info.h"
 #include "styles/style_layers.h"
@@ -445,6 +446,23 @@ void BuildSectionButtons(SectionBuilder &builder) {
 		.targetSection = CallsId(),
 		.icon = { &st::menuIconUnmute },
 		.keywords = { u"sessions"_q, u"calls"_q },
+	});
+
+	builder.addButton({
+		.id = u"main/yiligram"_q,
+		.title = rpl::single(u"YiliGram"_q),
+		.icon = { &st::menuIconPalette },
+		.onClick = [=] {
+			controller->show(Box(Yili::SettingsBox));
+		},
+		.keywords = {
+			u"yiligram"_q,
+			u"avatar"_q,
+			u"shape"_q,
+			u"frame"_q,
+			u"badge"_q,
+			u"tails"_q,
+		},
 	});
 
 	builder.addButton({

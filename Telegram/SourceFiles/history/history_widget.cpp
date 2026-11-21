@@ -215,6 +215,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "tgw/tgw_scroll.h"
 #include "dialogs/dialogs_key.h"
 #include "calls/calls_instance.h"
+#include "yiligram/yili_settings.h"
 #include "styles/style_boxes.h"
 #include "styles/style_chat.h"
 #include "styles/style_window.h"
@@ -795,6 +796,12 @@ HistoryWidget::HistoryWidget(
 		crl::on_main(this, [=] {
 			updateHistoryGeometry();
 		});
+	}, lifetime());
+	Yili::SettingsChanges(
+	) | rpl::on_next([=] {
+		refreshSendGiftToggle();
+		updateControlsVisibility();
+		updateControlsGeometry();
 	}, lifetime());
 	Core::App().settings().sendSubmitWayValue(
 	) | rpl::on_next([=] {
@@ -4148,6 +4155,7 @@ void HistoryWidget::refreshSendGiftToggle() {
 		| Type::Limited
 		| Type::Unique;
 	const auto has = user
+		&& !Yili::HideGiftButton()
 		&& _canSendMessages
 		&& !user->isServiceUser()
 		&& !user->isSelf()
