@@ -17,6 +17,7 @@ function(generate_appstream_changelog target_name changelog_path metadata_path)
     OUTPUT
         ${gen_timestamp}
     COMMAND
+        ${CMAKE_COMMAND} -E env --unset=LD_LIBRARY_PATH
         ${Python3_EXECUTABLE}
         ${submodules_loc}/build/changelog2appstream.py
         -c "${changelog_path}"

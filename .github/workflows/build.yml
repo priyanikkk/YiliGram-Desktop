@@ -2,12 +2,9 @@ name: Build
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   linux:
@@ -42,7 +39,8 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Libraries cache.
-        uses: actions/cache@v4
+        id: libs-cache
+        uses: actions/cache/restore@v4
         with:
           path: ${{ runner.temp }}/.buildx-cache
           key: ${{ runner.OS }}-libs-${{ hashFiles('Telegram/build/docker/centos_env/**') }}
@@ -61,6 +59,13 @@ jobs:
         run: |
           rm -rf ${{ runner.temp }}/.buildx-cache
           mv ${{ runner.temp }}/.buildx-cache{-new,}
+
+      - name: Save libraries cache.
+        if: steps.libs-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/.buildx-cache
+          key: ${{ runner.OS }}-libs-${{ hashFiles('Telegram/build/docker/centos_env/**') }}
 
       - name: Build.
         env:
@@ -103,8 +108,10 @@ jobs:
     steps:
       - name: Prepare directories.
         run: |
-          mkdir %userprofile%\TBuild\Libraries
-          mklink /d %GITHUB_WORKSPACE%\TBuild %userprofile%\TBuild
+          for %%I in ("%GITHUB_WORKSPACE%") do set DRIVE=%%~dI
+          mkdir %DRIVE%\TBuild\Libraries
+          mklink /d %GITHUB_WORKSPACE%\TBuild %DRIVE%\TBuild
+          wmic logicaldisk get caption,freespace
           echo TBUILD=%GITHUB_WORKSPACE%\TBuild>>%GITHUB_ENV%
           echo LibrariesPath=%GITHUB_WORKSPACE%\TBuild\Libraries\win64>>%GITHUB_ENV%
 
@@ -131,6 +138,7 @@ jobs:
           echo "$(sha256sum $TBUILD/$REPO_NAME/$PREPARE_PATH | awk '{ print $1 }')" >> CACHE_KEY.txt
           echo "$SDK" >> CACHE_KEY.txt
           echo "CACHE_KEY=$(sha256sum CACHE_KEY.txt | awk '{ print $1 }')" >> $GITHUB_ENV
+          sed -i '/CMAKE_${lang}_FLAGS_DEBUG_INIT/s/${_Zi}//' "$PROGRAMFILES"/CMake/share/cmake*/Modules/Platform/Windows-MSVC.cmake
           git config --global user.email "build@localhost"
           git config --global user.name "build"
 
@@ -147,22 +155,44 @@ jobs:
           nuget sources Add -Source https://api.nuget.org/v3/index.json & exit 0
 
       - name: ThirdParty cache.
-        uses: actions/cache@v4
+        id: tp-cache
+        uses: actions/cache/restore@v4
         with:
           path: ${{ env.TBUILD }}\ThirdParty
           key: ${{ runner.OS }}-third-party-${{ env.CACHE_KEY }}
           restore-keys: ${{ runner.OS }}-third-party-
 
       - name: Libraries cache.
-        uses: actions/cache@v4
+        id: win-libs-cache
+        uses: actions/cache/restore@v4
         with:
           path: ${{ env.LibrariesPath }}
-          key: ${{ runner.OS }}-x64-qt6-libs-${{ env.CACHE_KEY }}
-          restore-keys: ${{ runner.OS }}-x64-qt6-libs-
+          key: ${{ runner.OS }}-x64-qt6-release-libs-${{ env.CACHE_KEY }}
+          restore-keys: ${{ runner.OS }}-x64-qt6-release-libs-
 
       - name: Libraries.
         run: |
-          %TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat skip-release silent qt6
+          %TBUILD%\%REPO_NAME%\Telegram\build\prepare\win.bat silent qt6
+
+      - name: Free up some disk space.
+        shell: bash
+        run: |
+          find $LibrariesPath '(' '(' ! '(' -name '*.lib' -o -name '*.a' -o -name '*.exe' -o -name '*.h' -o -name '*.hpp' -o -name '*.inc' -o -name '*.cmake' -o -name '*.pc' -o -path '*/include/*' -o -path '*/objects-*' -o -path '*/cache_keys/*' -o -path '*/patches/*' -o -path '*/nv-codec-headers/*' ')' -type f ')' -o -empty ')' -delete
+          df -h
+
+      - name: Save ThirdParty cache.
+        if: steps.tp-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.TBUILD }}\ThirdParty
+          key: ${{ runner.OS }}-third-party-${{ env.CACHE_KEY }}
+
+      - name: Save libraries cache.
+        if: steps.win-libs-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.LibrariesPath }}
+          key: ${{ runner.OS }}-x64-qt6-release-libs-${{ env.CACHE_KEY }}
 
       - name: Build.
         env:
@@ -190,20 +220,3 @@ jobs:
         with:
           name: YiliGram-windows-x64
           path: YiliGram-windows-x64.zip
-
-  release:
-    name: Release
-    if: startsWith(github.ref, 'refs/tags/')
-    needs: [linux, windows]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          merge-multiple: true
-      - name: Publish.
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create "$GITHUB_REF_NAME" YiliGram-linux-x64.tar.xz YiliGram-windows-x64.zip \
-            -R "$GITHUB_REPOSITORY" --title "YiliGram Desktop ${GITHUB_REF_NAME#v}" \
-            --notes "YiliGram for Windows (x64) and Linux (x64). Unpack and run YiliGram.exe / YiliGram."

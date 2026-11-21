@@ -28,8 +28,8 @@ Changes to submodules are kept as patches in `tools/yiligram/patches` and applie
 
 ## Building
 
-GitHub Actions (`.github/workflows/build.yml`) builds Windows x64 and Linux x64. A tag `v*` publishes a
-release. The repository secrets `TDESKTOP_API_ID` and `TDESKTOP_API_HASH` must hold the API
+GitHub Actions (`.github/workflows/build.yml`, run by hand) builds Windows x64 and Linux x64. The
+repository secrets `TDESKTOP_API_ID` and `TDESKTOP_API_HASH` must hold the API
 credentials from [my.telegram.org](https://my.telegram.org).
 
 For a local build follow the upstream instructions in [docs](docs), and run
