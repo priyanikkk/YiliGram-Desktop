@@ -18,8 +18,13 @@ YiliGram keeps its data apart from Telegram Desktop (`%APPDATA%\YiliGram Desktop
 ## Changes from Telegram Desktop
 
 - name, icon and window titles;
-- Material 3 palette built from the YiliGram seed color `#8C7A5B` (replaces the blue accents and the
-  green outgoing messages of the default theme);
+- Material 3 palette built from the YiliGram seed color `#8C7A5B` for the day and night themes
+  (replaces the blue accents and the green outgoing messages of the default themes);
+- Material 3 switches;
+- avatar shapes from the Material 3 Expressive set (Settings → YiliGram);
+- YiliGram badges for the team, beta testers and official channels, shared with the Android app
+  (granted from a profile's menu, kept in Saved Messages under `#yiligram_badges`);
+- optional: messages without bubble tails, no call button in the chat header, no gift button;
 - no update checks against Telegram's servers and no crash reports;
 - own `api_id`.
 
