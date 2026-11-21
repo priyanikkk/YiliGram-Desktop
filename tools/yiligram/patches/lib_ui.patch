@@ -1,3 +1,16 @@
+diff --git a/ui/basic.style b/ui/basic.style
+index 28095c2..df87d67 100644
+--- a/ui/basic.style
++++ b/ui/basic.style
+@@ -104,7 +104,7 @@ linkCropLimit: 360px;
+ linkFont: normalFont;
+ linkFontOver: font(fsize underline);
+ 
+-roundRadiusLarge: 6px;
++roundRadiusLarge: 8px;
+ roundRadiusSmall: 3px;
+ 
+ dateRadius: roundRadiusLarge;
 diff --git a/ui/colors.palette b/ui/colors.palette
 index e2ba0d6..84cb6b7 100644
 --- a/ui/colors.palette
@@ -405,6 +418,19 @@ index e2ba0d6..84cb6b7 100644
 +dialogsMentionIconFg: #c09848 | dialogsVerifiedIconBg; // chat list mention icon
  dialogsReactionIconFg: #e05356 | attentionButtonFg; // chat list reaction icon
  dialogsPollIconFg: #997be1 | historyPeer5NameFg; // chat list poll icon
+diff --git a/ui/layers/layers.style b/ui/layers/layers.style
+index ebb7796..0f38aea 100644
+--- a/ui/layers/layers.style
++++ b/ui/layers/layers.style
+@@ -35,7 +35,7 @@ Box {
+ }
+ 
+ boxDuration: 200;
+-boxRadius: 8px;
++boxRadius: 16px;
+ 
+ boxButtonFont: font(boxFontSize semibold);
+ defaultBoxButtonTextStyle: TextStyle(semiboldTextStyle) {
 diff --git a/ui/widgets/checkbox.cpp b/ui/widgets/checkbox.cpp
 index df0dc58..da992e8 100644
 --- a/ui/widgets/checkbox.cpp
@@ -481,3 +507,24 @@ index d351629..d6bc102 100644
  	void paintXV(QPainter &p, int left, int top, int outerWidth, float64 toggled, const QBrush &brush);
  	QSize rippleSize() const;
  
+diff --git a/ui/widgets/widgets.style b/ui/widgets/widgets.style
+index 8b8df7d..06a94c7 100644
+--- a/ui/widgets/widgets.style
++++ b/ui/widgets/widgets.style
+@@ -727,6 +727,7 @@ defaultActiveButton: RoundButton {
+ 
+ 	width: -34px;
+ 	height: 34px;
++	fullRadius: true;
+ 	padding: margins(0px, 0px, 0px, 0px);
+ 
+ 	textTop: 8px;
+@@ -1252,7 +1253,7 @@ defaultPeerListCheckbox: RoundImageCheckbox {
+ 	check: defaultPeerListCheck;
+ }
+ 
+-innerDropdownRadius: 8px;
++innerDropdownRadius: 12px;
+ defaultInnerDropdown: InnerDropdown {
+ 	padding: margins(10px, 10px, 10px, 10px);
+ 	shadow: roundShadowRadius8px;
