@@ -7,6 +7,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "ui/controls/userpic_button.h"
 
+#include "yiligram/yili_shapes.h"
+
 #include "apiwrap.h"
 #include "api/api_peer_photo.h"
 #include "ui/effects/upload_progress_overlay.h"
@@ -1156,7 +1158,7 @@ void UserpicButton::showCustom(QImage &&image) {
 				std::move(small),
 				Images::CornersMask(_st.photoSize
 					* Ui::ForumUserpicRadiusMultiplier()))
-			: Images::Circle(std::move(small)));
+			: Yili::ApplyAvatarFrame(std::move(small)));
 	} else {
 		_userpic = CreateSquarePixmap(_st.photoSize, [&](Painter &p) {
 			fillShape(p, CreateDefaultGradientBrush(_st.photoSize));
@@ -1236,7 +1238,7 @@ void UserpicButton::fillShape(QPainter &p, QBrush brush) const {
 		const auto radius = size * Ui::ForumUserpicRadiusMultiplier();
 		p.drawRoundedRect(0, 0, size, size, radius, radius);
 	} else {
-		p.drawEllipse(0, 0, size, size);
+		p.drawPath(Yili::AvatarFramePath(QRectF(0, 0, size, size)));
 	}
 }
 
@@ -1273,7 +1275,7 @@ void UserpicButton::prepareUserpicPixmap() {
 							std::move(image),
 							Images::CornersMask(size
 								* Ui::ForumUserpicRadiusMultiplier()))
-						: Images::Circle(std::move(image));
+						: Yili::ApplyAvatarFrame(std::move(image));
 					image.setDevicePixelRatio(style::DevicePixelRatio());
 					p.drawImage(0, 0, image);
 				}

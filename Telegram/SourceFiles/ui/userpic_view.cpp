@@ -10,6 +10,7 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "ui/empty_userpic.h"
 #include "ui/painter.h"
 #include "ui/image/image_prepare.h"
+#include "yiligram/yili_shapes.h"
 
 #include <cmath>
 
@@ -142,8 +143,10 @@ void ValidateUserpicCache(
 	const auto full = QSize(size, size);
 	const auto version = style::PaletteVersion();
 	const auto shapeValue = static_cast<uint32>(shape) & 3;
+	const auto frameVersion = Yili::AvatarFrameVersion();
 	const auto regenerate = (view.cached.size() != QSize(size, size))
 		|| (view.shape != shapeValue)
+		|| (view.frameVersion != frameVersion)
 		|| (cloud && !view.empty.null())
 		|| (empty && empty != view.empty.get())
 		|| (empty && view.paletteVersion != version);
@@ -153,6 +156,7 @@ void ValidateUserpicCache(
 	view.empty = empty;
 	view.shape = shapeValue;
 	view.paletteVersion = version;
+	view.frameVersion = frameVersion;
 
 	if (cloud) {
 		view.cached = cloud->scaled(
@@ -168,7 +172,7 @@ void ValidateUserpicCache(
 					* Ui::ForumUserpicRadiusMultiplier()
 					/ style::DevicePixelRatio()));
 		} else {
-			view.cached = Images::Circle(std::move(view.cached));
+			view.cached = Yili::ApplyAvatarFrame(std::move(view.cached));
 		}
 	} else {
 		if (view.cached.size() != full) {

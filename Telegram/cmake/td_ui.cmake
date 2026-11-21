@@ -740,6 +740,9 @@ PRIVATE
     window/window_slide_animation.cpp
     window/window_slide_animation.h
 
+    yiligram/yili_shapes.cpp
+    yiligram/yili_shapes.h
+
     ui/ui_pch.h
 )
 

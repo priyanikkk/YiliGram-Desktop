@@ -7,6 +7,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "ui/empty_userpic.h"
 
+#include "yiligram/yili_shapes.h"
+
 #include "info/channel_statistics/earn/earn_icons.h"
 #include "ui/chat/chat_style.h"
 #include "ui/effects/animation_value.h"
@@ -340,7 +342,7 @@ void EmptyUserpic::paintCircle(
 		int outerWidth,
 		int size) const {
 	paint(p, x, y, outerWidth, size, [&] {
-		p.drawEllipse(x, y, size, size);
+		p.drawPath(Yili::AvatarFramePath(QRectF(x, y, size, size)));
 	});
 }
 
@@ -406,7 +408,7 @@ void EmptyUserpic::PaintSavedMessages(
 	PainterHighQualityEnabler hq(p);
 	p.setBrush(std::move(bg));
 	p.setPen(Qt::NoPen);
-	p.drawEllipse(x, y, size, size);
+	p.drawPath(Yili::AvatarFramePath(QRectF(x, y, size, size)));
 
 	PaintSavedMessagesInner(p, x, y, size, fg);
 }
@@ -445,7 +447,7 @@ void EmptyUserpic::PaintRepliesMessages(
 	PainterHighQualityEnabler hq(p);
 	p.setBrush(bg);
 	p.setPen(Qt::NoPen);
-	p.drawEllipse(x, y, size, size);
+	p.drawPath(Yili::AvatarFramePath(QRectF(x, y, size, size)));
 
 	PaintRepliesMessagesInner(p, x, y, size, fg);
 }
@@ -484,7 +486,7 @@ void EmptyUserpic::PaintHiddenAuthor(
 	PainterHighQualityEnabler hq(p);
 	p.setBrush(bg);
 	p.setPen(Qt::NoPen);
-	p.drawEllipse(x, y, size, size);
+	p.drawPath(Yili::AvatarFramePath(QRectF(x, y, size, size)));
 
 	PaintHiddenAuthorInner(p, x, y, size, fg);
 }
@@ -517,7 +519,7 @@ void EmptyUserpic::PaintMyNotes(
 	PainterHighQualityEnabler hq(p);
 	p.setBrush(bg);
 	p.setPen(Qt::NoPen);
-	p.drawEllipse(x, y, size, size);
+	p.drawPath(Yili::AvatarFramePath(QRectF(x, y, size, size)));
 
 	PaintMyNotesInner(p, x, y, size, fg);
 }
@@ -550,7 +552,7 @@ void EmptyUserpic::PaintCurrency(
 	PainterHighQualityEnabler hq(p);
 	p.setBrush(bg);
 	p.setPen(Qt::NoPen);
-	p.drawEllipse(x, y, size, size);
+	p.drawPath(Yili::AvatarFramePath(QRectF(x, y, size, size)));
 
 	PaintCurrencyInner(p, x, y, size, fg);
 }

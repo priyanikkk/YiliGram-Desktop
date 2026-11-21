@@ -7,6 +7,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 */
 #include "data/data_peer.h"
 
+#include "yiligram/yili_shapes.h"
+
 #include "api/api_sensitive_content.h"
 #include "data/data_user.h"
 #include "data/data_chat.h"
@@ -517,7 +519,7 @@ QImage PeerData::GenerateUserpicImage(
 		} else if (peer->isForum()) {
 			return round(size * Ui::ForumUserpicRadiusMultiplier());
 		} else {
-			return Images::Circle(std::move(image));
+			return Yili::ApplyAvatarFrame(std::move(image));
 		}
 	}
 	auto result = QImage(
