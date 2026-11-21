@@ -67,6 +67,7 @@ jobs:
           API_ID: ${{ secrets.TDESKTOP_API_ID }}
           API_HASH: ${{ secrets.TDESKTOP_API_HASH }}
         run: |
+          if [ -n "$API_ID" ]; then API="-D TDESKTOP_API_ID=$API_ID -D TDESKTOP_API_HASH=$API_HASH"; else API="-D TDESKTOP_API_TEST=ON"; fi
           docker run --rm \
           -u $(id -u) \
           -v $PWD:/usr/src/tdesktop \
@@ -74,8 +75,7 @@ jobs:
           $IMAGE_TAG \
           /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh \
           -D CMAKE_CONFIGURATION_TYPES=Release \
-          -D TDESKTOP_API_ID="$API_ID" \
-          -D TDESKTOP_API_HASH="$API_HASH" \
+          $API \
           -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON \
           -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
 
@@ -169,10 +169,10 @@ jobs:
           API_ID: ${{ secrets.TDESKTOP_API_ID }}
           API_HASH: ${{ secrets.TDESKTOP_API_HASH }}
         run: |
+          set API=-D TDESKTOP_API_TEST=ON
+          if not "%API_ID%"=="" set API=-D TDESKTOP_API_ID=%API_ID% -D TDESKTOP_API_HASH=%API_HASH%
           cd %TBUILD%\%REPO_NAME%\Telegram
-          call configure.bat x64 qt6 ^
-          -D TDESKTOP_API_ID=%API_ID% ^
-          -D TDESKTOP_API_HASH=%API_HASH% ^
+          call configure.bat x64 qt6 %API% ^
           -D CMAKE_CONFIGURATION_TYPES=Release ^
           -D DESKTOP_APP_DISABLE_AUTOUPDATE=ON ^
           -D DESKTOP_APP_DISABLE_CRASH_REPORTS=ON
