@@ -1,4 +1,4 @@
-# YiliGram Desktop
+# YiliGram Desktop (Примечание на русском я не очень знаю спп и если есть баги пишите мне в телеграм, билда еще нету)
 
 Unofficial Telegram client for Windows and Linux, the desktop sibling of
 [YiliGram](https://github.com/priyanikkk/YiliGram) for Android. Based on
